@@ -100,4 +100,18 @@ public interface ILineDataSet extends ILineRadarDataSet<Entry> {
      * @return
      */
     IFillFormatter getFillFormatter();
+
+    /**
+     * Returns the LineFillGradientSpec for this DataSet.
+     *
+     * @return
+     */
+    LineDataSet.LineFillGradientSpec getLineFillGradientSpec();
+
+    /**
+     * Returns the selected coloring mode for the dataset
+     *
+     * @return
+     */
+    LineDataSet.ColoringMode getColoringMode();
 }

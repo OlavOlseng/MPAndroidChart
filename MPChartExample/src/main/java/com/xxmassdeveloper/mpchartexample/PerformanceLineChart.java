@@ -86,10 +86,15 @@ public class PerformanceLineChart extends DemoBase implements OnSeekBarChangeLis
         set1.setDrawCircles(false);
         set1.setMode(LineDataSet.Mode.LINEAR);
         set1.setDrawFilled(false);
+        set1.setLineFillGradientSpec(new LineDataSet.LineFillGradientSpec(
+                0xFFBB0099,
+                0xFF00FFCC,
+                250,
+                50000,
+                LineDataSet.LineFillGradientSpec.Orientation.HORIZONTAL));
 
         // create a data object with the data sets
         LineData data = new LineData(set1);
-
         // set data
         chart.setData(data);
 

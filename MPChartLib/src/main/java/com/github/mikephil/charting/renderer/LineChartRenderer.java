@@ -115,8 +115,9 @@ public class LineChartRenderer extends LineRadarRenderer {
 
         mRenderPaint.setStrokeWidth(dataSet.getLineWidth());
         mRenderPaint.setPathEffect(dataSet.getDashPathEffect());
-        applyLineGradient(dataSet, mRenderPaint);
-
+        if (dataSet.getColoringMode() == LineDataSet.ColoringMode.GRADIENT) {
+            applyLineGradient(dataSet, mRenderPaint);
+        }
 
         switch (dataSet.getMode()) {
             default:
@@ -761,21 +762,35 @@ public class LineChartRenderer extends LineRadarRenderer {
         }
     }
 
+
+    /**
+     * Used to apply the LineFillGradientSpec held by the dataset
+     *
+     * @param dataSet
+     * @param paint
+     */
     private void applyLineGradient(ILineDataSet dataSet, Paint paint) {
         YAxis axis = mChart.getAxis(dataSet.getAxisDependency());
-        float mAxisRange = axis.mAxisRange;
-        float mAxisGradientCenter = 300f;
-        float mAxisGradientCenterPercentage = (mAxisGradientCenter) / mAxisRange;
+        float axisRange = axis.mAxisRange;
 
-        float smearPercentage = 0.3f;
+        LineDataSet.LineFillGradientSpec gradientSpec = dataSet.getLineFillGradientSpec();
+        float axisGradientCenterPercentage = gradientSpec.mGradientCenterValue / axisRange;
+        float axisGradientBlendRangePercentage = gradientSpec.mGradientBlendValueRange / axisRange / 2f;
+
+        float x0 = 0, y0 = 0, x1 = 0, y1 = 0;
+        if (gradientSpec.mOrientation == LineDataSet.LineFillGradientSpec.Orientation.HORIZONTAL) {
+            y1 = axisRange;
+        } else {
+            x1 = mChart.getXRange();
+        }
         LinearGradient gradient = new LinearGradient(
-                0f,
-                0f,
-                0f,
-                mAxisRange,
-                new int[]{0xFF0000FF, 0xFFFF0000},
-                new float[]{mAxisGradientCenterPercentage - smearPercentage / 2f, 1f - mAxisGradientCenterPercentage + smearPercentage / 2f},
-                Shader.TileMode.REPEAT
+                x0,
+                y0,
+                x1,
+                y1,
+                new int[]{gradientSpec.mFirstColor, gradientSpec.mSecondColor},
+                new float[]{axisGradientCenterPercentage - axisGradientBlendRangePercentage, axisGradientCenterPercentage + axisGradientBlendRangePercentage},
+                Shader.TileMode.CLAMP
         );
 
         Matrix valueToPixelMatrix = mChart.getTransformer(dataSet.getAxisDependency()).getValueToPixelMatrix();

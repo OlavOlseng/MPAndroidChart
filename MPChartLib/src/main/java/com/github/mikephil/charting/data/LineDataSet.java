@@ -64,6 +64,12 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
 
     private boolean mDrawCircleHole = true;
 
+    /**
+     * Path coloring mode for this line dataset
+     */
+    private LineDataSet.ColoringMode mColoringMode = ColoringMode.STANDARD;
+
+    private LineFillGradientSpec mLineFillGradientSpec = null;
 
     public LineDataSet(List<Entry> yVals, String label) {
         super(yVals, label);
@@ -408,10 +414,67 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
         return mFillFormatter;
     }
 
+    public void setColoringMode(ColoringMode coloringMode) {
+        mColoringMode = coloringMode;
+    }
+
+    public ColoringMode getColoringMode() {
+        return mColoringMode;
+    }
+
+    public void setLineFillGradientSpec(LineFillGradientSpec lineFillGradientSpec) {
+        if (lineFillGradientSpec == null) {
+            mColoringMode = ColoringMode.STANDARD;
+        } else {
+            mColoringMode = ColoringMode.GRADIENT;
+        }
+        mLineFillGradientSpec = lineFillGradientSpec;
+    }
+
+    @Override
+    public LineFillGradientSpec getLineFillGradientSpec() {
+        return mLineFillGradientSpec;
+    }
+
     public enum Mode {
         LINEAR,
         STEPPED,
         CUBIC_BEZIER,
         HORIZONTAL_BEZIER
+    }
+
+    public enum ColoringMode {
+        STANDARD,
+        GRADIENT
+    }
+
+    public static class LineFillGradientSpec {
+
+        public enum Orientation {
+            HORIZONTAL,
+            VERTICAL
+        }
+
+        public final Orientation mOrientation;
+
+        public final float mGradientCenterValue;
+        public final float mGradientBlendValueRange;
+
+        public final int mFirstColor;
+        public final int mSecondColor;
+
+        public LineFillGradientSpec(
+                int firstColor,
+                int secondColor,
+                float gradientCenterValue,
+                float gradientBlendValueRange,
+                Orientation orientation) {
+            mFirstColor = firstColor;
+            mSecondColor = secondColor;
+            mOrientation = orientation;
+            mGradientCenterValue = gradientCenterValue;
+            mGradientBlendValueRange = gradientBlendValueRange;
+
+        }
     }
 }
