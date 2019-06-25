@@ -3,12 +3,16 @@ package com.github.mikephil.charting.renderer;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 
 import com.github.mikephil.charting.animation.ChartAnimator;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -111,6 +115,8 @@ public class LineChartRenderer extends LineRadarRenderer {
 
         mRenderPaint.setStrokeWidth(dataSet.getLineWidth());
         mRenderPaint.setPathEffect(dataSet.getDashPathEffect());
+        applyLineGradient(dataSet, mRenderPaint);
+
 
         switch (dataSet.getMode()) {
             default:
@@ -578,8 +584,8 @@ public class LineChartRenderer extends LineRadarRenderer {
                         Utils.drawImage(
                                 c,
                                 icon,
-                                (int)(x + iconsOffset.x),
-                                (int)(y + iconsOffset.y),
+                                (int) (x + iconsOffset.x),
+                                (int) (y + iconsOffset.y),
                                 icon.getIntrinsicWidth(),
                                 icon.getIntrinsicHeight());
                     }
@@ -753,6 +759,29 @@ public class LineChartRenderer extends LineRadarRenderer {
             mDrawBitmap.clear();
             mDrawBitmap = null;
         }
+    }
+
+    private void applyLineGradient(ILineDataSet dataSet, Paint paint) {
+        YAxis axis = mChart.getAxis(dataSet.getAxisDependency());
+        float mAxisRange = axis.mAxisRange;
+        float mAxisGradientCenter = 300f;
+        float mAxisGradientCenterPercentage = (mAxisGradientCenter) / mAxisRange;
+
+        float smearPercentage = 0.3f;
+        LinearGradient gradient = new LinearGradient(
+                0f,
+                0f,
+                0f,
+                mAxisRange,
+                new int[]{0xFF0000FF, 0xFFFF0000},
+                new float[]{mAxisGradientCenterPercentage - smearPercentage / 2f, 1f - mAxisGradientCenterPercentage + smearPercentage / 2f},
+                Shader.TileMode.REPEAT
+        );
+
+        Matrix valueToPixelMatrix = mChart.getTransformer(dataSet.getAxisDependency()).getValueToPixelMatrix();
+        gradient.setLocalMatrix(valueToPixelMatrix);
+
+        paint.setShader(gradient);
     }
 
     private class DataSetImageCache {
