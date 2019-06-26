@@ -12,7 +12,6 @@ import android.graphics.drawable.Drawable;
 
 import com.github.mikephil.charting.animation.ChartAnimator;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -770,33 +769,21 @@ public class LineChartRenderer extends LineRadarRenderer {
      * @param paint
      */
     private void applyLineGradient(ILineDataSet dataSet, Paint paint) {
-        YAxis axis = mChart.getAxis(dataSet.getAxisDependency());
-        float axisRange = axis.mAxisRange;
-
-        LineDataSet.LineFillGradientSpec gradientSpec = dataSet.getLineFillGradientSpec();
-        float axisGradientCenterPercentage = gradientSpec.mGradientCenterValue / axisRange;
-        float axisGradientBlendRangePercentage = gradientSpec.mGradientBlendValueRange / axisRange / 2f;
-
-        float x0 = 0, y0 = 0, x1 = 0, y1 = 0;
-        if (gradientSpec.mOrientation == LineDataSet.LineFillGradientSpec.Orientation.HORIZONTAL) {
-            y1 = axisRange;
+        DataSetImageCache imageCache;
+        if (mImageCaches.containsKey(dataSet)) {
+            imageCache = mImageCaches.get(dataSet);
         } else {
-            x1 = mChart.getXRange();
+            imageCache = new DataSetImageCache();
+            mImageCaches.put(dataSet, imageCache);
         }
-        LinearGradient gradient = new LinearGradient(
-                x0,
-                y0,
-                x1,
-                y1,
-                new int[]{gradientSpec.mFirstColor, gradientSpec.mSecondColor},
-                new float[]{axisGradientCenterPercentage - axisGradientBlendRangePercentage, axisGradientCenterPercentage + axisGradientBlendRangePercentage},
-                Shader.TileMode.CLAMP
-        );
-
+        boolean hasShader = imageCache.hasCachedShader(dataSet);
+        if (!hasShader) {
+            imageCache.createLineShader(dataSet);
+        }
+        Shader s = imageCache.getLineShader();
         Matrix valueToPixelMatrix = mChart.getTransformer(dataSet.getAxisDependency()).getValueToPixelMatrix();
-        gradient.setLocalMatrix(valueToPixelMatrix);
-
-        paint.setShader(gradient);
+        s.setLocalMatrix(valueToPixelMatrix);
+        paint.setShader(s);
     }
 
     private class DataSetImageCache {
@@ -804,6 +791,10 @@ public class LineChartRenderer extends LineRadarRenderer {
         private Path mCirclePathBuffer = new Path();
 
         private Bitmap[] circleBitmaps;
+
+        Shader mLineShader;
+
+        boolean mShaderDirty = true;
 
         /**
          * Sets up the cache, returns true if a change of cache was required.
@@ -887,6 +878,47 @@ public class LineChartRenderer extends LineRadarRenderer {
             }
         }
 
+        protected boolean hasCachedShader(ILineDataSet set) {
+            return mLineShader != null
+                    && set.getColoringMode() == LineDataSet.ColoringMode.GRADIENT
+                    && !mShaderDirty;
+        }
+
+        /**
+         * Creates a Shader that corresponds to the LineGradientSpec attached to the dataset
+         *
+         * @param set
+         * @return
+         */
+        protected void createLineShader(ILineDataSet set) {
+
+            float x0 = 0, y0 = 0, x1 = 0, y1 = 0;
+            float axisRange = 0;
+            LineDataSet.LineFillGradientSpec gradientSpec = set.getLineFillGradientSpec();
+            if (gradientSpec.mOrientation == LineDataSet.LineFillGradientSpec.Orientation.HORIZONTAL) {
+                axisRange = mChart.getXRange();
+                x1 = axisRange;
+            } else {
+                axisRange = mChart.getAxis(set.getAxisDependency()).mAxisRange;
+                y1 = axisRange;
+            }
+            float axisGradientCenterPercentage = gradientSpec.mGradientCenterValue / axisRange;
+            float axisGradientBlendRangePercentage = gradientSpec.mGradientBlendValueRange / axisRange / 2f;
+
+            LinearGradient gradient = new LinearGradient(
+                    x0,
+                    y0,
+                    x1,
+                    y1,
+                    new int[]{gradientSpec.mFirstColor, gradientSpec.mSecondColor},
+                    new float[]{axisGradientCenterPercentage - axisGradientBlendRangePercentage, axisGradientCenterPercentage + axisGradientBlendRangePercentage},
+                    Shader.TileMode.CLAMP
+            );
+
+            mLineShader = gradient;
+            mShaderDirty = false;
+        }
+
         /**
          * Returns the cached Bitmap at the given index.
          *
@@ -895,6 +927,15 @@ public class LineChartRenderer extends LineRadarRenderer {
          */
         protected Bitmap getBitmap(int index) {
             return circleBitmaps[index % circleBitmaps.length];
+        }
+
+        /**
+         * Returns the cached gradient shader to be applied to an mRendererPaint.
+         * This value has no transformation applied.
+         * @return
+         */
+        protected Shader getLineShader() {
+            return mLineShader;
         }
     }
 }

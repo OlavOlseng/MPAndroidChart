@@ -111,6 +111,8 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
         lineDataSet.mDrawCircles = mDrawCircleHole;
         lineDataSet.mFillFormatter = mFillFormatter;
         lineDataSet.mMode = mMode;
+        lineDataSet.mColoringMode = mColoringMode;
+        lineDataSet.mLineFillGradientSpec = mLineFillGradientSpec;
     }
 
     /**
@@ -414,14 +416,16 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
         return mFillFormatter;
     }
 
-    public void setColoringMode(ColoringMode coloringMode) {
-        mColoringMode = coloringMode;
-    }
 
     public ColoringMode getColoringMode() {
         return mColoringMode;
     }
 
+    /**
+     * This function will set the LineFillGradient spec to be used when drawing the path of the DataSet,
+     * as well as setting the proper ColoringMode.
+     * @param lineFillGradientSpec the gradient spec to be used. If null, coloring mode is set to standard.
+     */
     public void setLineFillGradientSpec(LineFillGradientSpec lineFillGradientSpec) {
         if (lineFillGradientSpec == null) {
             mColoringMode = ColoringMode.STANDARD;
@@ -429,6 +433,14 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
             mColoringMode = ColoringMode.GRADIENT;
         }
         mLineFillGradientSpec = lineFillGradientSpec;
+    }
+
+    /**
+     * Sets the coloring mode to ColoringMode.Standard
+     */
+    public void disableLineFillGradient() {
+        mColoringMode = ColoringMode.STANDARD;
+        mLineFillGradientSpec = null;
     }
 
     @Override
@@ -463,6 +475,14 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
         public final int mFirstColor;
         public final int mSecondColor;
 
+        /**
+         *
+         * @param firstColor
+         * @param secondColor
+         * @param gradientCenterValue the value that the gradient will attempt to center on
+         * @param gradientBlendValueRange the total range the gradient will stretch across
+         * @param orientation
+         */
         public LineFillGradientSpec(
                 int firstColor,
                 int secondColor,
