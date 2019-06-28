@@ -878,10 +878,16 @@ public class LineChartRenderer extends LineRadarRenderer {
             }
         }
 
+
+        /**
+         * This function checks if the linedataset has a valid cached shader.
+         * @param set
+         * @return
+         */
         protected boolean needsNewShader(ILineDataSet set) {
-            return mLineShader != null
-                    && set.getColoringMode() == LineDataSet.ColoringMode.GRADIENT
-                    && !mShaderDirty;
+            return set.getColoringMode() == LineDataSet.ColoringMode.GRADIENT
+            && (mLineShader == null || mShaderDirty);
+
         }
 
         /**
