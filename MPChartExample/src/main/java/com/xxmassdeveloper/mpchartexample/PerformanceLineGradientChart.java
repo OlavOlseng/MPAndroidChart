@@ -22,7 +22,7 @@ import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase;
 import java.util.ArrayList;
 
 @SuppressWarnings("SameParameterValue")
-public class PerformanceLineChart extends DemoBase implements OnSeekBarChangeListener {
+public class PerformanceLineGradientChart extends DemoBase implements OnSeekBarChangeListener {
 
     private LineChart chart;
     private SeekBar seekBarValues;
@@ -86,6 +86,12 @@ public class PerformanceLineChart extends DemoBase implements OnSeekBarChangeLis
         set1.setDrawCircles(false);
         set1.setMode(LineDataSet.Mode.LINEAR);
         set1.setDrawFilled(false);
+        set1.setLineFillGradientSpec(new LineDataSet.LineFillGradientSpec(
+                0xFF6666FF,
+                0xFF66FF66,
+                250,
+                300,
+                LineDataSet.LineFillGradientSpec.Orientation.VERTICAL));
 
         // create a data object with the data sets
         LineData data = new LineData(set1);
@@ -94,13 +100,12 @@ public class PerformanceLineChart extends DemoBase implements OnSeekBarChangeLis
 
         // get the legend (only possible after setting data)
         Legend l = chart.getLegend();
-        l.setEnabled(false);
+        l.setEnabled(true);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.only_github, menu);
-        return true;
+        return false;
     }
 
     @Override

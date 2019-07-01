@@ -35,6 +35,7 @@ import com.xxmassdeveloper.mpchartexample.ListViewBarChartActivity;
 import com.xxmassdeveloper.mpchartexample.ListViewMultiChartActivity;
 import com.xxmassdeveloper.mpchartexample.MultiLineChartActivity;
 import com.xxmassdeveloper.mpchartexample.PerformanceLineChart;
+import com.xxmassdeveloper.mpchartexample.PerformanceLineGradientChart;
 import com.xxmassdeveloper.mpchartexample.PieChartActivity;
 import com.xxmassdeveloper.mpchartexample.PiePolylineChartActivity;
 import com.xxmassdeveloper.mpchartexample.R;
@@ -120,6 +121,8 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         objects.add(34, new ContentItem("Dynamic", "Build a line chart by adding points and sets."));
         objects.add(35, new ContentItem("Realtime", "Add data points in realtime."));
         objects.add(36, new ContentItem("Hourly", "Uses the current time to add a data point for each hour."));
+        objects.add(37, new ContentItem("GradientLine", "Uses a gradient shader to draw the line path"));
+
         //objects.add(37, new ContentItem("Realm.io Examples", "See more examples that use Realm.io mobile database."));
 
         MyAdapter adapter = new MyAdapter(this, objects);
@@ -228,6 +231,9 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
                 break;
             case 36:
                 i = new Intent(this, LineChartTime.class);
+                break;
+            case 37:
+                i = new Intent(this, PerformanceLineGradientChart.class);
                 break;
             /*case 37:
                 i = new Intent(this, RealmMainActivity.class);
