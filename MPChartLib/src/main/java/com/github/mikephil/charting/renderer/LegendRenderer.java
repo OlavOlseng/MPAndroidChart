@@ -3,17 +3,23 @@ package com.github.mikephil.charting.renderer;
 
 import android.graphics.Canvas;
 import android.graphics.DashPathEffect;
+import android.graphics.LinearGradient;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Path;
+import android.graphics.Shader;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.LegendEntry;
 import com.github.mikephil.charting.data.ChartData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IPieDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.FSize;
@@ -189,13 +195,18 @@ public class LegendRenderer extends Renderer {
                             label = data.getDataSetByIndex(i).getLabel();
                         }
 
+                        LineDataSet.LineFillGradientSpec lineGradientSpec = null;
+                        if (dataSet instanceof ILineDataSet) {
+                            lineGradientSpec = ((ILineDataSet) dataSet).getLineFillGradientSpec();
+                        }
                         computedEntries.add(new LegendEntry(
                                 label,
                                 dataSet.getForm(),
                                 dataSet.getFormSize(),
                                 dataSet.getFormLineWidth(),
                                 dataSet.getFormLineDashEffect(),
-                                clrs.get(j)
+                                clrs.get(j),
+                                lineGradientSpec
                         ));
                     }
                 }
@@ -502,6 +513,10 @@ public class LegendRenderer extends Renderer {
                         : entry.formSize);
         final float half = formSize / 2f;
 
+        if (entry.lineGradientSpec != null) {
+//            mLegendFormPaint.setShader(createFillGradientShader(entry.lineGradientSpec, 0, 0, 32, 0));
+        }
+
         switch (form) {
             case NONE:
                 // Do nothing
@@ -519,6 +534,13 @@ public class LegendRenderer extends Renderer {
 
             case SQUARE:
                 mLegendFormPaint.setStyle(Paint.Style.FILL);
+                if (entry.lineGradientSpec != null) {
+                    Matrix m = new Matrix();
+                    m.setTranslate(x, y);
+                    Shader s = createFillGradientShader(entry.lineGradientSpec, 0, 0, formSize, 0);
+                    s.setLocalMatrix(m);
+                    mLegendFormPaint.setShader(s);
+                }
                 c.drawRect(x, y - half, x + formSize, y + half, mLegendFormPaint);
                 break;
 
@@ -544,6 +566,22 @@ public class LegendRenderer extends Renderer {
         }
 
         c.restoreToCount(restoreCount);
+    }
+
+    protected Shader createFillGradientShader(LineDataSet.LineFillGradientSpec spec,
+                                              float x0,
+                                              float y0,
+                                              float x1,
+                                              float y1) {
+        return new LinearGradient(
+                x0,
+                y0,
+                x1,
+                y1,
+                new int[]{spec.mFirstColor, spec.mSecondColor},
+                null,
+                Shader.TileMode.REPEAT
+        );
     }
 
     /**
