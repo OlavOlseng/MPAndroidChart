@@ -89,9 +89,9 @@ public class PerformanceLineGradientChart extends DemoBase implements OnSeekBarC
         set1.setLineFillGradientSpec(new LineDataSet.LineFillGradientSpec(
                 0xFF6666FF,
                 0xFF66FF66,
-                250,
-                300,
-                LineDataSet.LineFillGradientSpec.Orientation.VERTICAL));
+                3,
+                4,
+                LineDataSet.LineFillGradientSpec.Orientation.HORIZONTAL));
 
         // create a data object with the data sets
         LineData data = new LineData(set1);
@@ -100,6 +100,7 @@ public class PerformanceLineGradientChart extends DemoBase implements OnSeekBarC
 
         // get the legend (only possible after setting data)
         Legend l = chart.getLegend();
+        l.setForm(Legend.LegendForm.DEFAULT);
         l.setEnabled(true);
     }
 

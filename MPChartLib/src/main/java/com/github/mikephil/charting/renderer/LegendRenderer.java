@@ -514,7 +514,11 @@ public class LegendRenderer extends Renderer {
         final float half = formSize / 2f;
 
         if (entry.lineGradientSpec != null) {
-//            mLegendFormPaint.setShader(createFillGradientShader(entry.lineGradientSpec, 0, 0, 32, 0));
+            Matrix m = new Matrix();
+            m.setTranslate(x, y);
+            Shader s = createFillGradientShader(entry.lineGradientSpec, 0, 0, formSize, 0);
+            s.setLocalMatrix(m);
+            mLegendFormPaint.setShader(s);
         }
 
         switch (form) {
@@ -534,13 +538,6 @@ public class LegendRenderer extends Renderer {
 
             case SQUARE:
                 mLegendFormPaint.setStyle(Paint.Style.FILL);
-                if (entry.lineGradientSpec != null) {
-                    Matrix m = new Matrix();
-                    m.setTranslate(x, y);
-                    Shader s = createFillGradientShader(entry.lineGradientSpec, 0, 0, formSize, 0);
-                    s.setLocalMatrix(m);
-                    mLegendFormPaint.setShader(s);
-                }
                 c.drawRect(x, y - half, x + formSize, y + half, mLegendFormPaint);
                 break;
 
