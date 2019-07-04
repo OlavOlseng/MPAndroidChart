@@ -96,6 +96,7 @@ public class PerformanceLineGradientChart extends DemoBase implements OnSeekBarC
         // create a data object with the data sets
         LineData data = new LineData(set1);
         // set data
+        chart.setHardwareAccelerationEnabled(true);
         chart.setData(data);
 
         // get the legend (only possible after setting data)
