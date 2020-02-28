@@ -922,19 +922,18 @@ public class LineChartRenderer extends LineRadarRenderer {
                 axisRange = mChart.getAxis(set.getAxisDependency()).mAxisRange;
                 y1 = axisRange;
             }
-            float axisGradientCenterPercentage = gradientSpec.mGradientCenterValue / axisRange;
-            float axisGradientBlendRangePercentage =
-                    gradientSpec.mGradientBlendValueRange / axisRange / 2f;
+            float[] normalizedValues = new float[gradientSpec.mValues.length];
+            for (int i = 0; i < normalizedValues.length; i++) {
+                normalizedValues[i] = gradientSpec.mValues[i] / axisRange;
+            }
 
             LinearGradient gradient = new LinearGradient(
                     x0,
                     y0,
                     x1,
                     y1,
-                    new int[]{gradientSpec.mFirstColor, gradientSpec.mSecondColor},
-                    new float[]{
-                            axisGradientCenterPercentage - axisGradientBlendRangePercentage,
-                            axisGradientCenterPercentage + axisGradientBlendRangePercentage},
+                    gradientSpec.mColors,
+                    normalizedValues,
                     Shader.TileMode.CLAMP
             );
 

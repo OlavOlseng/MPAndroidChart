@@ -585,8 +585,8 @@ public class LegendRenderer extends Renderer {
                 y0,
                 x1,
                 y1,
-                new int[]{spec.mFirstColor, spec.mSecondColor},
-                new float[]{0.33f,.66f},
+                spec.mColors,
+                spec.mValues,
                 Shader.TileMode.REPEAT
         );
     }

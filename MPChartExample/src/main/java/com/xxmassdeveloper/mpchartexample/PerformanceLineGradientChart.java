@@ -86,11 +86,22 @@ public class PerformanceLineGradientChart extends DemoBase implements OnSeekBarC
         set1.setDrawCircles(false);
         set1.setMode(LineDataSet.Mode.LINEAR);
         set1.setDrawFilled(false);
+
+        int[] colors = new int[] {
+                0xFF0000FF,
+                0xFF00FF00,
+                0xFFFF0000
+        };
+
+        float[] valueThresholds = new float[] {
+                2f,
+                3f,
+                4f
+        };
+
         set1.setLineFillGradientSpec(new LineDataSet.LineFillGradientSpec(
-                0xFF6666FF,
-                0xFF66FF66,
-                3,
-                4,
+                colors,
+                valueThresholds,
                 LineDataSet.LineFillGradientSpec.Orientation.HORIZONTAL));
 
         // create a data object with the data sets

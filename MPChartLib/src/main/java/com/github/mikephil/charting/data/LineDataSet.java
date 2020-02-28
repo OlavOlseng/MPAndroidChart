@@ -424,6 +424,7 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
     /**
      * This function will set the LineFillGradient spec to be used when drawing the path of the DataSet,
      * as well as setting the proper ColoringMode.
+     *
      * @param lineFillGradientSpec the gradient spec to be used. If null, coloring mode is set to standard.
      */
     public void setLineFillGradientSpec(LineFillGradientSpec lineFillGradientSpec) {
@@ -469,19 +470,15 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
 
         public final Orientation mOrientation;
 
-        public final float mGradientCenterValue;
-        public final float mGradientBlendValueRange;
-
-        public final int mFirstColor;
-        public final int mSecondColor;
+        public final int[] mColors;
+        public final float[] mValues;
 
         /**
-         *
-         * @param firstColor
-         * @param secondColor
+         * @param firstColor the first color of the gradient
+         * @param secondColor the second color of the gradient
          * @param gradientCenterValue the value that the gradient will attempt to center on
          * @param gradientBlendValueRange the total range the gradient will stretch across
-         * @param orientation
+         * @param orientation what axis to align the gradient with
          */
         public LineFillGradientSpec(
                 int firstColor,
@@ -489,12 +486,29 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
                 float gradientCenterValue,
                 float gradientBlendValueRange,
                 Orientation orientation) {
-            mFirstColor = firstColor;
-            mSecondColor = secondColor;
-            mOrientation = orientation;
-            mGradientCenterValue = gradientCenterValue;
-            mGradientBlendValueRange = gradientBlendValueRange;
+            this(
+                    new int[]{firstColor, secondColor},
+                    new float[]{
+                            gradientCenterValue - gradientBlendValueRange,
+                            gradientCenterValue + gradientBlendValueRange},
+                    orientation
+            );
+        }
 
+        /**
+         * @param colors an array of ARGB colors
+         * @param valueThresholds the values på start gradients
+         * @param orientation what axis to align the gradient with
+         *
+         * Note: colors and valueThresholds should be of the same size.
+         */
+        public LineFillGradientSpec(
+                int[] colors,
+                float[] valueThresholds,
+                Orientation orientation) {
+            mColors = colors;
+            mValues = valueThresholds;
+            mOrientation = orientation;
         }
     }
 }
